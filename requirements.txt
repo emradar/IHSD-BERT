@@ -1,0 +1,11 @@
+torch==2.2.2+cu118
+transformers
+datasets
+scikit-learn
+pandas
+numpy
+SentencePiece
+accelerate
+tensorflow
+tf-keras
+phonetics
