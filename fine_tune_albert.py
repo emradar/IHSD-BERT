@@ -19,7 +19,10 @@ def to_binary(example):
     example["label"] = int(example["hate_speech_score"] >= 0.5)
     return example
 
-dataset = dataset["train"].map(to_binary)
+# transformations on the dataset
+def transform_dataset():
+    dataset = dataset["train"].map(to_binary)
+    
 
 # splitting dataset into train and validation
 split = dataset.train_test_split(test_size=0.2, seed=42)
@@ -59,14 +62,16 @@ def compute_metrics(pred):
 log_dir = f"./logs/albert_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 training_args = TrainingArguments(
     output_dir="./albert_finetuned",
+    eval_strategy="epoch",
     save_strategy="epoch",
     logging_dir=log_dir,
-    num_train_epochs=1, # 1 for now for experiments
+    num_train_epochs=3,
     per_device_train_batch_size=32,
     per_device_eval_batch_size=32,
     learning_rate=2e-5,
     weight_decay=0.01,
     fp16=torch.cuda.is_available(),
+    logging_strategy="steps",
     logging_steps=50,
     report_to="tensorboard",  
 )
@@ -83,13 +88,3 @@ trainer = Trainer(
 
 # training the model
 trainer.train()
-
-text = "I h@t3 u"  # coded or obfuscated hate
-
-inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-inputs = {k: v.to(device) for k, v in inputs.items()}
-
-with torch.no_grad():
-    outputs = model(**inputs)
-    prediction = torch.argmax(outputs.logits, dim=1).item()
-    print("Prediction:", "Hate Speech" if prediction == 1 else "Not Hate Speech")

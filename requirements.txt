@@ -3,9 +3,10 @@ transformers
 datasets
 scikit-learn
 pandas
-numpy
+numpy==1.26.4
 SentencePiece
 accelerate
 tensorflow
 tf-keras
 phonetics
+nltk
